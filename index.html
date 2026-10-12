@@ -1,0 +1,191 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>내 몸 속 원 찾기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: 따뜻한 도트 배경 위 한 장의 '측정 카드' — 왼쪽 입력, 오른쪽 원 그림, 아래 기록 */
+:root{
+  --bg:#fff4e6; --dot:#ffd9b3; --card:#fffdf8; --ink:#4a3428; --muted:#8a6f60;
+  --accent:#ff8a5c; --accent-ink:#ffffff; --mint:#5cbfa5; --soft:#ffe8d4; --line:#f0d6c0;
+  --display:"Jua","Gowun Dodum",system-ui,sans-serif;
+  --body:"Gowun Dodum",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#2b201b; --dot:#3d2d25; --card:#362820; --ink:#fbeee3; --muted:#c9ad9b;
+  --accent:#ff9a70; --accent-ink:#2b201b; --mint:#7fd6bf; --soft:#46332a; --line:#4f3b30; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#2b201b; --dot:#3d2d25; --card:#362820; --ink:#fbeee3; --muted:#c9ad9b;
+  --accent:#ff9a70; --accent-ink:#2b201b; --mint:#7fd6bf; --soft:#46332a; --line:#4f3b30; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  background-image:radial-gradient(var(--dot) 2.5px,transparent 2.6px);background-size:26px 26px;
+  padding-inline:16px;padding-block:28px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+header{text-align:center}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2rem,6vw,2.9rem);margin:0;line-height:1.2;text-wrap:balance}
+h1 .o{display:inline-block;width:.9em;height:.9em;border:.13em solid var(--accent);border-radius:50%;vertical-align:-.08em;margin-inline:.05em}
+.sub{margin:.4rem 0 0;color:var(--muted)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:28px;padding:24px;box-shadow:0 6px 0 var(--line)}
+.main{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
+@media (max-width:720px){.main{grid-template-columns:1fr}}
+.main>*{min-width:0}
+h2{font-family:var(--display);font-weight:400;font-size:1.3rem;margin:0 0 .6rem}
+.step{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:1rem;border:2px solid var(--line);background:var(--soft);color:var(--ink);
+  border-radius:999px;padding:6px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip:focus-visible,input:focus-visible,button:focus-visible{outline:3px solid var(--mint);outline-offset:2px}
+.field{display:flex;align-items:center;gap:8px}
+input[type=number],input[type=text]{font:inherit;font-size:1.4rem;width:100%;max-width:170px;padding:8px 12px;border-radius:14px;
+  border:2px solid var(--line);background:var(--card);color:var(--ink);font-variant-numeric:tabular-nums}
+#other{font-size:1rem;max-width:220px}
+.unit{font-family:var(--display);font-size:1.3rem}
+.go{font-family:var(--display);font-size:1.25rem;border:0;border-radius:18px;padding:12px 22px;background:var(--accent);
+  color:var(--accent-ink);cursor:pointer;box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 60%,var(--ink));align-self:flex-start}
+.go:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--accent) 60%,var(--ink))}
+.err{color:#d2453b;min-height:1.4em;margin:0;font-size:.95rem}
+:root[data-theme="dark"] .err{color:#ff8f86}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .err{color:#ff8f86}}
+.tip{font-size:.92rem;color:var(--muted);background:var(--soft);border-radius:14px;padding:10px 14px;margin:0}
+.viz{display:flex;flex-direction:column;align-items:center;gap:12px}
+svg{width:100%;max-width:320px;height:auto}
+.result{text-align:center}
+.result .big{font-family:var(--display);font-size:clamp(2.2rem,8vw,3rem);color:var(--accent);line-height:1.1;font-variant-numeric:tabular-nums}
+.calc{font-variant-numeric:tabular-nums;background:var(--soft);border-radius:14px;padding:10px 16px;font-size:1.05rem;overflow-wrap:anywhere}
+.calc b{color:var(--mint)}
+.note{font-size:.92rem;color:var(--muted);margin:0;text-align:center}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px dashed var(--line)}
+th{font-family:var(--display);font-weight:400;color:var(--muted)}
+td.n{text-align:right} th.n{text-align:right}
+.tbl{overflow-x:auto}
+.empty{color:var(--muted);margin:0}
+.row-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.clear{font:inherit;font-size:.9rem;background:none;border:2px solid var(--line);color:var(--muted);border-radius:999px;padding:4px 12px;cursor:pointer}
+#circ{transition:stroke-dashoffset .9s ease}
+@media (prefers-reduced-motion: reduce){#circ{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>내 몸 속 <span class="o" aria-hidden="true"></span>원 찾기</h1>
+    <p class="sub">줄자로 잰 둘레를 넣으면, 원주율로 지름을 예측해 줘요.</p>
+  </header>
+
+  <section class="card main">
+    <form id="f" novalidate>
+      <div class="step">
+        <h2>① 어디를 재었나요?</h2>
+        <div class="chips" id="parts" role="group" aria-label="잰 부위">
+          <button type="button" class="chip" data-p="손목" aria-pressed="true">손목</button>
+          <button type="button" class="chip" data-p="엄지손가락" aria-pressed="false">엄지손가락</button>
+          <button type="button" class="chip" data-p="검지손가락" aria-pressed="false">검지손가락</button>
+          <button type="button" class="chip" data-p="발목" aria-pressed="false">발목</button>
+          <button type="button" class="chip" data-p="팔뚝" aria-pressed="false">팔뚝</button>
+          <button type="button" class="chip" data-p="기타" aria-pressed="false">직접 쓰기</button>
+        </div>
+        <input type="text" id="other" placeholder="부위 이름 쓰기" hidden maxlength="12">
+      </div>
+      <div class="step">
+        <h2>② 둘레(원주)는 몇 cm인가요?</h2>
+        <div class="field">
+          <input type="number" id="c" inputmode="decimal" min="0" step="0.1" value="15" aria-label="둘레(cm)">
+          <span class="unit">cm</span>
+        </div>
+        <p class="err" id="err" role="alert"></p>
+        <button class="go" type="submit">지름 예측하기</button>
+      </div>
+      <p class="tip">줄자는 느슨하지 않게, 비스듬하지 않게 한 바퀴 감아서 재요.</p>
+    </form>
+
+    <div class="viz" aria-live="polite">
+      <svg viewBox="0 0 240 240" role="img" aria-labelledby="svgT">
+        <title id="svgT">둘레와 지름을 나타낸 원 그림</title>
+        <circle cx="120" cy="120" r="88" fill="var(--soft)" stroke="var(--line)" stroke-width="3"></circle>
+        <circle id="circ" cx="120" cy="120" r="88" fill="none" stroke="var(--accent)" stroke-width="7" stroke-linecap="round"
+          transform="rotate(-90 120 120)" stroke-dasharray="553" stroke-dashoffset="0"></circle>
+        <line x1="32" y1="120" x2="208" y2="120" stroke="var(--mint)" stroke-width="5" stroke-linecap="round"></line>
+        <circle cx="120" cy="120" r="5" fill="var(--ink)"></circle>
+        <text id="dLabel" x="120" y="108" text-anchor="middle" font-family="Jua, sans-serif" font-size="18" fill="var(--mint)">지름 ?</text>
+        <text id="cLabel" x="120" y="22" text-anchor="middle" font-family="Jua, sans-serif" font-size="16" fill="var(--accent)">둘레 ?</text>
+      </svg>
+      <div class="result">
+        <div id="partName" style="color:var(--muted)">손목의 예측 지름</div>
+        <div class="big" id="big">약 4.8 cm</div>
+      </div>
+      <div class="calc" id="calc">지름 = 둘레 ÷ 원주율<br>15 ÷ <b>3.141592</b> = 4.77…</div>
+      <p class="note">몸은 완전한 원이 아니라서 예측한 지름은 어림값이에요.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row-head">
+      <h2>나의 예측 기록</h2>
+      <button type="button" class="clear" id="clear">기록 지우기</button>
+    </div>
+    <div class="tbl">
+      <table id="tbl" hidden>
+        <thead><tr><th>부위</th><th class="n">둘레</th><th class="n">예측 지름</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="empty" id="empty">위에서 예측하면 여기에 차례로 쌓여요. 여러 부위를 재어 보고 둘레와 지름이 어떤 관계인지 살펴보세요.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  const PI = 3.141592;
+  const LEN = 2*Math.PI*88;
+  let part = '손목';
+  const $ = id => document.getElementById(id);
+  const chips = document.querySelectorAll('.chip');
+  chips.forEach(ch => ch.addEventListener('click', () => {
+    chips.forEach(c => c.setAttribute('aria-pressed', c===ch ? 'true':'false'));
+    part = ch.dataset.p;
+    $('other').hidden = part !== '기타';
+    if(part==='기타') $('other').focus();
+  }));
+
+  const fmt = (n,d) => Number(n.toFixed(d)).toString();
+  function trunc(n){ // 소수 둘째 자리까지 보여주고 뒤는 …
+    const s = (Math.floor(n*100)/100).toFixed(2);
+    return s + '…';
+  }
+  function draw(c,d,name){
+    const circ = $('circ');
+    circ.style.transition='none'; circ.style.strokeDashoffset = LEN;
+    circ.getBoundingClientRect();
+    circ.style.transition=''; circ.style.strokeDashoffset = 0;
+    $('dLabel').textContent = '지름 약 ' + fmt(d,1) + 'cm';
+    $('cLabel').textContent = '둘레 ' + fmt(c,1) + 'cm';
+    $('partName').textContent = name + '의 예측 지름';
+    $('big').textContent = '약 ' + fmt(d,1) + ' cm';
+    $('calc').innerHTML = '지름 = 둘레 ÷ 원주율<br>' + fmt(c,1) + ' ÷ <b>3.141592</b> = ' + trunc(d);
+  }
+  const rows = [];
+  function render(){
+    $('tbl').hidden = rows.length===0; $('empty').hidden = rows.length>0;
+    $('rows').innerHTML = rows.map(r =>
+      `<tr><td>${r.name.replace(/[<>&]/g,'')}</td><td class="n">${fmt(r.c,1)} cm</td><td class="n">약 ${fmt(r.d,1)} cm</td></tr>`
+    ).join('');
+  }
+  $('f').addEventListener('submit', e => {
+    e.preventDefault();
+    const c = parseFloat($('c').value);
+    let name = part==='기타' ? ($('other').value.trim() || '내가 고른 부위') : part;
+    if(!isFinite(c) || c<=0){ $('err').textContent='둘레를 0보다 큰 수로 써 주세요.'; return; }
+    if(c>100){ $('err').textContent='100cm보다 작은 수를 써 주세요. 단위가 cm인지 확인해요.'; return; }
+    $('err').textContent='';
+    const d = c/PI;
+    draw(c,d,name);
+    rows.push({name,c,d}); render();
+  });
+  $('clear').addEventListener('click', () => { rows.length=0; render(); });
+  $('circ').setAttribute('stroke-dasharray', LEN);
+})();
+</script>
+
+</body></html>
